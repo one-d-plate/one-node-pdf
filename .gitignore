@@ -2,3 +2,5 @@
 yarn.lock
 output
 node_modules
+dist
+deploy

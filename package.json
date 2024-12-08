@@ -1,8 +1,26 @@
 {
-  "name": "one-node-pdf",
-  "version": "1.0.0",
-  "main": "src/main.ts",
-  "author": "just-one-d",
-  "license": "MIT",
-  "dependencies": {}
+    "name": "one-node-pdf",
+    "version": "1.0.0",
+    "main": "dist/main.js",
+    "author": "just-one-d",
+    "license": "MIT",
+    "scripts": {
+        "start": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "@google-cloud/pubsub": "^4.9.0",
+        "@types/express": "^5.0.0",
+        "@types/node": "^22.10.1",
+        "body-parser": "^1.20.3",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "google-auth-library": "^9.15.0",
+        "typescript": "^5.7.2",
+        "winston": "^3.17.0"
+    },
+    "optionalDependencies": {},
+    "devDependencies": {
+        "ts-node": "^10.9.2"
+    }
 }
