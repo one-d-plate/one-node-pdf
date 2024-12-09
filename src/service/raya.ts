@@ -26,8 +26,18 @@ const ToPdf = async (browser: Browser, data: any, log: winston.Logger) => {
 };
 
 const render = async (data: { name: string; age: number }): Promise<string> => {
-    const template = fs.readFileSync('./src/renderer/raya/assesment.ejs', 'utf-8');
-    const renderedHtml = ejs.render(template, data);
+    const template = fs.readFileSync('./src/renderer/raya/test.ejs', 'utf-8');
+
+    const scores = [
+        { subject: 'Mathematics', value: 85 },
+        { subject: 'Science', value: 90 },
+        { subject: 'English', value: 88 },
+        { subject: 'History', value: 92 },
+    ];
+
+    const fullData = { ...data, scores };
+
+    const renderedHtml = ejs.render(template, fullData);
     return renderedHtml;
 };
 
