@@ -4,6 +4,7 @@ import { logger } from './bootstrap/logger';
 import route from './route/route'
 import { NewPubSubClient } from './bootstrap/pubsub';
 import { ServerConfig } from './config/config';
+import { NewBrowser } from './bootstrap/puppeteer';
 
 dotenv.config()
 
@@ -14,7 +15,9 @@ const port = ServerConfig.port
 const log  = logger
 
 const pubsubClient = NewPubSubClient(log)
-route.NewRoute(pubsubClient, log)
+const puppeteer = NewBrowser(log)
+
+route.NewRoute(pubsubClient, puppeteer, log)
 
 app.listen(port, () => {
     console.log(`Server is running on http://${ServerConfig.host}:${port}`);
