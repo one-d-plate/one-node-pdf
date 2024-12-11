@@ -4,8 +4,8 @@ FROM node:18.20.4 AS builder
 # Set working directory
 WORKDIR /app
 
-# Menyalin package.json dan yarn.lock
-COPY package*.json yarn.lock ./
+# Menyalin package.json
+COPY package*.json ./
 
 # Menginstal dependensi
 RUN yarn install
@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 
 # Menyalin package.json dan yarn.lock untuk runtime
-COPY package*.json yarn.lock ./
+COPY package*.json ./
 
 # Menginstal dependensi produksi
 RUN yarn install --production
