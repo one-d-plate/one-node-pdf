@@ -1,35 +1,28 @@
 # Stage 1: Build
-FROM node:18.20.4 AS builder
+FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Menyalin package.json
+# Copy package.json and package-lock.json (or yarn.lock) to install dependencies
 COPY package*.json ./
 
-# Menginstal dependensi
-RUN yarn install
-
-# Menyalin semua file ke dalam container
-COPY . .
-
-# Membangun aplikasi TypeScript
-RUN yarn run build
+# Install dependencies and build the application
+RUN yarn install && yarn run build
 
 # Stage 2: Run
-FROM node:18.20.4
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Menyalin hasil build dari stage sebelumnya
+# Copy only the build output and production dependencies
 COPY --from=builder /app/dist ./dist
-
-# Menyalin package.json dan yarn.lock untuk runtime
 COPY package*.json ./
-
-# Menginstal dependensi produksi
 RUN yarn install --production
 
-# Menjalankan aplikasi
+# Expose the application port (if necessary, e.g., 3000)
+# EXPOSE 3000
+
+# Start the application
 CMD ["node", "dist/index.js"]

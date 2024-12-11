@@ -10,28 +10,8 @@ on:
 
 jobs:
   build:
-    name: Build Application
+    name: Build Docker Image
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18.20.4'
-
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Build application
-        run: yarn run build
-
-  deploy:
-    name: Deploy Docker Image
-    runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Checkout code
