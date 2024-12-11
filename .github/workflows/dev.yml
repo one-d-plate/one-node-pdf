@@ -31,7 +31,7 @@ jobs:
         run: echo "${{ secrets.GIT_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/one-node-pdf:latest .
+        run: docker build -t ghcr.io/${{ github.repository }}/one-node-pdf:latest .
 
       - name: Push Docker image
-        run: docker push ghcr.io/one-node-pdf:latest
+        run: docker push ghcr.io/${{ github.repository }}/one-node-pdf:latest

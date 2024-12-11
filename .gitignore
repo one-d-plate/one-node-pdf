@@ -4,3 +4,4 @@ output
 node_modules
 dist
 deploy/*.json
+package-lock.json
