@@ -1,11 +1,12 @@
 {
     "name": "one-node-pdf",
     "version": "1.0.0",
-    "main": "dist/main.js",
+    "main": "dist/index.js",
     "author": "just-one-d",
     "license": "MIT",
     "scripts": {
-        "start": "ts-node src/index.ts"
+        "start": "ts-node src/index.ts",
+        "build": "tsc"
     },
     "dependencies": {
         "@google-cloud/pubsub": "^4.9.0",
