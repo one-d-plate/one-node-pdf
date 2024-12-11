@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
 
     steps:
       - name: Checkout code
@@ -19,19 +19,70 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18.20.4'
+          node-version: '18'  # Ganti dengan versi Node.js yang Anda gunakan
 
       - name: Install dependencies
         run: yarn install
 
-      - name: Build
+      - name: Build application
         run: yarn run build
 
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GIT_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+  lint:
+    runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
+    needs: build  # Menjalankan job ini setelah job build selesai
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'  # Ganti dengan versi Node.js yang Anda gunakan
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint code
+        run: yarn run lint  # Ganti dengan perintah lint yang sesuai
+
+  test:
+    runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
+    needs: build  # Menjalankan job ini setelah job build selesai
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'  # Ganti dengan versi Node.js yang Anda gunakan
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run tests
+        run: yarn run test  # Ganti dengan perintah test yang sesuai
+
+  deploy:
+    runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
+    needs: [build, lint, test]  # Menjalankan job ini setelah job build, lint, dan test selesai
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'  # Ganti dengan versi Node.js yang Anda gunakan
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/one-node-pdf:latest .
+        run: docker build -t ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:latest .
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/one-node-pdf:latest
+        run: docker push ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:latest
