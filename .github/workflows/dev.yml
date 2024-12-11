@@ -28,7 +28,7 @@ jobs:
         run: yarn run build
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:latest .
+        run: docker build -t ghcr.io/${{ github.repository }}/one-node-pdf:latest .
 
       - name: Verify Docker image
         run: docker images  # Menampilkan daftar image yang ada
