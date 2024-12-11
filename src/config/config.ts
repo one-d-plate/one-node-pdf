@@ -13,7 +13,9 @@ export const ServerConfig: IServer = {
     env: process.env.APP_ENV ?? 'local'
 }
 
-export const LoadCredentials = (filePath: string): JWTInput | undefined => {
+const LoadCredentials = (): JWTInput | undefined => {
+    const filePath = './deploy/one-d-444103-fcff363b7c33.json';
+    
     try {
         const data = fs.readFileSync(filePath, 'utf8');
         const credentials: JWTInput = JSON.parse(data);
@@ -24,12 +26,10 @@ export const LoadCredentials = (filePath: string): JWTInput | undefined => {
     }
 };
 
-const credentialsPath = './deploy/one-d-444103-fcff363b7c33.json';
-const credentials = LoadCredentials(credentialsPath);
-
 export const PubSubConfig: ClientConfig = {
-    credentials: EnvCheck(ServerConfig.env as string) == 'local' ? credentials : undefined,
-    projectId: process.env.PUBSUB_PROJECT_ID
+    credentials: EnvCheck(ServerConfig.env as string) === 'local' ? LoadCredentials() : undefined,
+    projectId: process.env.PUBSUB_PROJECT_ID,
 };
+
 
 export const SubscriptionName = process.env.PUBSUB_SUBSCRIPTION_NAME

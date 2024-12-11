@@ -5,13 +5,16 @@ import fs from 'fs';
 import ejs from 'ejs';
 import { PaperConfig } from "../config/pdf";
 
-const ToPdf = async (browser: Browser, data: any, log: winston.Logger) => {
+const ToPdf = async (browser: Browser, filename: string, data: any, log: winston.Logger) => {
     let page;
     try {
         page = await browser.newPage();
         const htmlPage = await render(data);
         await page.setContent(htmlPage, { waitUntil: 'domcontentloaded' });   
-        await page.pdf(PaperConfig);
+        await page.pdf({
+            ...PaperConfig,
+            path: `${PaperConfig.path}/${filename}`
+        });
 
         log.info("Berhasil render");
     } catch (error) {

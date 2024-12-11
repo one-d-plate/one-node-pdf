@@ -18,16 +18,18 @@ const NewRoute = async (subscription: Subscription, puppeteer: Promise<Browser>,
 
         subscription.on('message', message => {
             log.info(`Received message: ${message.id}`);
-            log.info(`Data: ${message.data.toString()}`);
 
             const jsonString = message.data.toString();
             const jsonData   = JSON.parse(jsonString);
 
             message.ack();
             
-            const docType = jsonData.doc;
-            const data    = jsonData.data;
-            routing(docType, data)
+            const docType  = jsonData.doc;
+            const data     = jsonData.data;
+            const filename = jsonData.doc_name;
+
+            log.info(data)
+            routing(docType, filename, data)
         });
 
         subscription.on('error', error => {
@@ -39,9 +41,9 @@ const NewRoute = async (subscription: Subscription, puppeteer: Promise<Browser>,
     }
 }
 
-const routing = (route: string, data: any) => {
+const routing = (route: string, filename: string, data: any) => {
     const routes: { [key: string]: Promise<void> } = {
-        raya: Raya.ToPdf(browser as Browser, data, logger as winston.Logger),
+        raya: Raya.ToPdf(browser as Browser, filename, data, logger as winston.Logger),
     };
 
     routes[route]
