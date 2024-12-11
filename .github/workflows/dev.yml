@@ -30,6 +30,9 @@ jobs:
       - name: Build Docker image
         run: docker build -t ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:latest .
 
+      - name: Verify Docker image
+        run: docker images  # Menampilkan daftar image yang ada
+
   deploy:
     runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
     needs: build  # Menjalankan job ini setelah job build selesai
