@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-requirement:
-    runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
+    runs-on: ubuntu-22.04 
 
     steps:
       - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18.20.4'  # Ganti dengan versi Node.js yang Anda gunakan
+          node-version: '18.20.4'
 
       - name: Install dependencies
         run: yarn install
@@ -28,8 +28,8 @@ jobs:
         run: yarn run build
 
   deploy-to-ghcr:
-    runs-on: ubuntu-22.04  # Menentukan runner Ubuntu 22.04
-    needs: [build]  # Menjalankan job ini setelah job build, lint, dan test selesai
+    runs-on: ubuntu-22.04 
+    needs: build-requirement 
 
     steps:
       - name: Checkout code
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18.20.4'  # Ganti dengan versi Node.js yang Anda gunakan
+          node-version: '18.20.4'
 
       - name: Build Docker image
         run: docker build -t ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:latest .
