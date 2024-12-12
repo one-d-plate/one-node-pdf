@@ -1,0 +1,13 @@
+# .dockerignore
+.git
+.vscode
+.idea
+node_modules
+dist
+coverage
+logs
+.nyc_output
+output
+.github
+chromium
+# ...

@@ -6,7 +6,7 @@ let pubSubClient: PubSub | null = null;
 
 export const NewPubSubClient = (log: winston.Logger): Subscription => {
     try {
-        if (!PubSubConfig.projectId || !SubscriptionName) {
+        if (!SubscriptionName) {
             throw new Error("Missing required environment variables for PubSub configuration.");
         }
 

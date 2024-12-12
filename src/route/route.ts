@@ -7,6 +7,7 @@ let logger: winston.Logger | null = null
 let browser: Browser | null
 
 const NewRoute = async (subscription: Subscription, puppeteer: Promise<Browser>, log: winston.Logger) => {
+    log.info("Running service")
     try {
         if (!logger) {
             logger = log

@@ -1,4 +1,7 @@
-export const EnvCheck = (env: string): string => {
+export const EnvCheck = (env: string | undefined): string => {
+    if (typeof env == undefined) {
+        return 'local'
+    }
     const envMap: { [key: string]: string } = {
         loc        : 'local',
         local      : 'local',
@@ -9,5 +12,5 @@ export const EnvCheck = (env: string): string => {
         production : 'production',
     };
 
-    return envMap[env] || 'unknown';
+    return envMap[env as string] || 'unknown';
 };
