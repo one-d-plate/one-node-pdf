@@ -33,3 +33,5 @@ export const PubSubConfig: ClientConfig = {
 
 
 export const SubscriptionName = process.env.PUBSUB_SUBSCRIPTION_NAME ?? undefined
+
+export const PuppeteerExPath = process.env.PUPPETEER_EXECUTABLE_PATH

@@ -7,3 +7,4 @@ deploy/*.json
 package-lock.json
 chromium
 docker-compose.*
+testing
