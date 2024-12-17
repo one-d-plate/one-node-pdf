@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        continue-on-error: false  # Ensures that failure here stops the pipeline
+        continue-on-error: false  # Ensures failure stops the pipeline
 
       - name: Validate secrets
         run: |
@@ -44,11 +44,13 @@ jobs:
       - name: Extract APP_CONFIG and set environment variables
         run: |
           echo "${{ secrets.APP_CONFIG }}" > app_config.json
+          cat app_config.json  # Debugging step to check the content of the JSON file
+
           export PROJECT_ID=$(jq -r '.GCP_PROJECT_ID' app_config.json)
           export PUBSUB_SUBSCRIPTION_NAME=$(jq -r '.PUBSUB_SUBSCRIPTION_NAME' app_config.json)
           export PUPPETEER_EXECUTABLE_PATH=$(jq -r '.PUPPETEER_EXECUTABLE_PATH' app_config.json)
-          
-          # Check for any error in extracting the variables
+
+          # Check if any required environment variable is empty
           if [ -z "$PROJECT_ID" ] || [ -z "$PUBSUB_SUBSCRIPTION_NAME" ] || [ -z "$PUPPETEER_EXECUTABLE_PATH" ]; then
             echo "Error: One or more required environment variables are not set correctly."
             exit 1
