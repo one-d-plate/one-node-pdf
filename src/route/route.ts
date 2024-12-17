@@ -1,5 +1,5 @@
 import { Subscription } from "@google-cloud/pubsub";
-import { Browser } from "puppeteer";
+import { Browser } from "puppeteer-core";
 import winston from "winston";
 import Raya from "../service/raya"
 

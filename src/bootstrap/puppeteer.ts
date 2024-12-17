@@ -1,4 +1,4 @@
-import puppeteer, { Browser } from "puppeteer";
+import puppeteer, { Browser } from "puppeteer-core";
 import winston from "winston";
 import { PuppeteerExPath } from "../config/config";
 
@@ -11,7 +11,8 @@ export const NewBrowser = async (log: winston.Logger): Promise<Browser> => {
     
     try {
         browser = await puppeteer.launch({
-            executablePath: PuppeteerExPath
+            executablePath: "/usr/bin/chromium-browser",
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         return browser;
     } catch (error) {

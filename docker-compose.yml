@@ -1,0 +1,10 @@
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: deploy/Dockerfile.app
+    image: node-pdf:latest
+    env_file:
+      - .env
+    volumes:
+      - ./output:/app/output
