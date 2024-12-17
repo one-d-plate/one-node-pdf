@@ -20,7 +20,7 @@ RUN apk add --no-cache \
 COPY --from=builder /app/src/renderer ./dist/renderer
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/deploy ./deploy
+# COPY --from=builder /app/deploy ./deploy
 
 # Set Chrome as default path
 ENV CHROME_BIN=/usr/bin/chromium-browser
