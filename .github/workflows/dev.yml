@@ -9,29 +9,61 @@ on:
       - dev
 
 jobs:
-  build_and_push: # Perubahan nama job untuk konsistensi
+  build_and_push:
     name: Build image & push
     runs-on: ubuntu-latest
 
-    # Tambahkan permissions untuk mengatur hak akses
     permissions:
-      contents: read        # Membaca konten repository
-      packages: write       # Menulis paket ke GitHub Container Registry
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.GCP_CREDENTIALS_JSON }}" ]; then
+            echo "Error: GCP_CREDENTIALS_JSON secret is not set."
+            exit 1
+          fi
+          if [ -z "${{ secrets.APP_CONFIG }}" ]; then
+            echo "Error: APP_CONFIG secret is not set."
+            exit 1
+          fi
+
+      - name: Setup GCP credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-credentials.json
+        run: |
+          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
+
+      - name: Extract APP_CONFIG and set environment variables
+        run: |
+          echo "${{ secrets.APP_CONFIG }}" > app_config.json
+          export PROJECT_ID=$(jq -r '.GCP_PROJECT_ID' app_config.json)
+          export PUBSUB_SUBSCRIPTION_NAME=$(jq -r '.PUBSUB_SUBSCRIPTION_NAME' app_config.json)
+          export PUPPETEER_EXECUTABLE_PATH=$(jq -r '.PUPPETEER_EXECUTABLE_PATH' app_config.json)
+          echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
+          echo "PUBSUB_SUBSCRIPTION_NAME=$PUBSUB_SUBSCRIPTION_NAME" >> $GITHUB_ENV
+          echo "PUPPETEER_EXECUTABLE_PATH=$PUPPETEER_EXECUTABLE_PATH" >> $GITHUB_ENV
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Enable Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build Docker image
+      - name: Build and Push Docker image
         run: |
-          docker build \
-            --file deploy/Dockerfile.app \
-            --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest .
-
-      - name: Push Docker image
-        run: |
-          docker push ghcr.io/${{ github.repository }}/one-node-pdf:latest
+          docker buildx build \
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/one-node-pdf:latest \
+            --cache-to=type=inline \
+            --push \
+            --file Dockerfile \
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest \
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} .

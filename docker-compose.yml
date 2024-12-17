@@ -1,8 +1,6 @@
 services:
   app:
-    build: 
-      context: .
-      dockerfile: deploy/Dockerfile.app
+    build: .
     image: node-pdf:latest
     env_file:
       - .env
