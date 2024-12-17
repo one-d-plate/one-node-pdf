@@ -11,13 +11,12 @@ export const NewBrowser = async (log: winston.Logger): Promise<Browser> => {
     
     try {
         browser = await puppeteer.launch({
-            executablePath: "/usr/bin/chromium-browser",
+            executablePath: PuppeteerExPath,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         return browser;
     } catch (error) {
         log.error("Error launching browser:", error);
-        log.info(`===============| INFO |================ ${PuppeteerExPath}`)
         throw error;
     }
 };
