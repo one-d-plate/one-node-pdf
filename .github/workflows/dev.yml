@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        continue-on-error: false  # Ensures that failure here stops the pipeline
 
       - name: Validate secrets
         run: |
@@ -31,12 +32,14 @@ jobs:
             echo "Error: APP_CONFIG secret is not set."
             exit 1
           fi
+        continue-on-error: false  # Ensures that failure here stops the pipeline
 
       - name: Setup GCP credentials
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-credentials.json
         run: |
           echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
+        continue-on-error: false  # Ensures failure stops further steps
 
       - name: Extract APP_CONFIG and set environment variables
         run: |
@@ -44,19 +47,30 @@ jobs:
           export PROJECT_ID=$(jq -r '.GCP_PROJECT_ID' app_config.json)
           export PUBSUB_SUBSCRIPTION_NAME=$(jq -r '.PUBSUB_SUBSCRIPTION_NAME' app_config.json)
           export PUPPETEER_EXECUTABLE_PATH=$(jq -r '.PUPPETEER_EXECUTABLE_PATH' app_config.json)
+          
+          # Check for any error in extracting the variables
+          if [ -z "$PROJECT_ID" ] || [ -z "$PUBSUB_SUBSCRIPTION_NAME" ] || [ -z "$PUPPETEER_EXECUTABLE_PATH" ]; then
+            echo "Error: One or more required environment variables are not set correctly."
+            exit 1
+          fi
+          
           echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
           echo "PUBSUB_SUBSCRIPTION_NAME=$PUBSUB_SUBSCRIPTION_NAME" >> $GITHUB_ENV
           echo "PUPPETEER_EXECUTABLE_PATH=$PUPPETEER_EXECUTABLE_PATH" >> $GITHUB_ENV
+        continue-on-error: false  # Ensures failure stops further steps
 
       - name: Install jq
         run: sudo apt-get install -y jq
+        continue-on-error: false  # Ensures failure stops further steps
 
       - name: Enable Docker Buildx
         uses: docker/setup-buildx-action@v2
+        continue-on-error: false  # Ensures failure stops further steps
 
       - name: Login to GitHub Container Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        continue-on-error: false  # Ensures failure stops further steps
 
       - name: Build and Push Docker image
         run: |
@@ -67,3 +81,4 @@ jobs:
             --file Dockerfile \
             --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest \
             --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} .
+        continue-on-error: false  # Ensures failure stops further steps

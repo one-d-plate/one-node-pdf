@@ -1,8 +1,5 @@
 services:
   app:
-    build: .
-    image: node-pdf:latest
-    env_file:
-      - .env
+    image: ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:1e74e8e480193d659a4c5c9bc0ae6132f0349791
     volumes:
       - ./output:/app/output
