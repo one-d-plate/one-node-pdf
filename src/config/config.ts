@@ -28,7 +28,7 @@ const LoadCredentials = (): JWTInput | undefined => {
 
 export const PubSubConfig: ClientConfig = {
     projectId: process.env.PUBSUB_PROJECT_ID,
-    credentials: EnvCheck(process.env.APP_ENV) == "local" ? LoadCredentials() : undefined
+    apiKey: process.env.PUBSUB_APIKEY,
 };
 
 
