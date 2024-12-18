@@ -32,7 +32,7 @@ jobs:
       - name: Retrieve .env file from Secret Manager
         run: |
           # Ambil file dari Secret Manager
-          gcloud secrets versions access latest --secret=ENV_FILE > .env
+          gcloud secrets versions access latest --secret=ONE_NODE_PDF > .env
           # Export semua variabel di .env ke $GITHUB_ENV
           set -a
           source .env
