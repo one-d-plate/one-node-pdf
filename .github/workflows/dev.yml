@@ -40,7 +40,7 @@ jobs:
       - name: Retrieve .env file from Secret Manager
         run: |
           # Ensure file path is correct
-          gcloud secrets versions access latest --secret=ENV_FILE > .env
+          gcloud secrets versions access latest --secret=ONE_NODE_PDF > .env
           # Export all variables from .env to environment
           set -a
           source .env
