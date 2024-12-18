@@ -14,31 +14,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code repository
+      # Checkout repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Authenticate with GCP
+      # Authenticate with GCP using service account JSON
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
 
+      # Make sure the credential JSON file is saved to disk (specify path)
+      - name: Write GCP credentials to file
+        run: |
+          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > gha-creds.json
+          ls -al gha-creds.json # Verify the file exists
+
       # Configure Google Cloud Project
       - name: Configure gcloud
-        run: gcloud config set project <GCP_PROJECT>
-  
+        run: |
+          # Setting project via gcloud
+          gcloud config set project $GCP_PROJECT
+
       # Retrieve .env file from Google Secret Manager
       - name: Retrieve .env file from Secret Manager
         run: |
-          # Ambil file dari Secret Manager
-          gcloud secrets versions access latest --secret=ONE_NODE_PDF > .env
-          # Export semua variabel di .env ke $GITHUB_ENV
+          # Ensure file path is correct
+          gcloud secrets versions access latest --secret=ENV_FILE > .env
+          # Export all variables from .env to environment
           set -a
           source .env
           set +a
-  
-      # Debugging: Print environment variables (optional)
+
+      # Print environment variables for debugging
       - name: Print environment variables (optional debugging)
         run: env
 
@@ -47,10 +55,11 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      # Build and push Docker image
+      # Build and Push Docker image
       - name: Build and Push Docker image
         run: |
           docker buildx build \
             --push \
             --file Dockerfile \
-            --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest 
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest \
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} .
