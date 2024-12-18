@@ -26,7 +26,7 @@ jobs:
 
       # Configure Google Cloud Project
       - name: Configure gcloud
-        run: gcloud config set project <PROJECT_ID>
+        run: gcloud config set project <GCP_PROJECT>
   
       # Retrieve .env file from Google Secret Manager
       - name: Retrieve .env file from Secret Manager
