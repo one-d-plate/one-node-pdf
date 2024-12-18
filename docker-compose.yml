@@ -1,5 +1,5 @@
 services:
   app:
-    image: ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:1e74e8e480193d659a4c5c9bc0ae6132f0349791
+    image: ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:45e0e43f1d037dfd796aaa1d11ff5ab1d6f73fe5
     volumes:
       - ./output:/app/output
