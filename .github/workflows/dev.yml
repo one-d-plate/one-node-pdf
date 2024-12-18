@@ -1,4 +1,4 @@
-name: Dev CI/CD Pipeline
+name: Build and Push to GHCR
 
 on:
   push:
@@ -10,77 +10,47 @@ on:
 
 jobs:
   build_and_push:
-    name: Build image & push
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-
     steps:
+      # Checkout code repository
       - name: Checkout code
         uses: actions/checkout@v3
-        continue-on-error: false  # Ensures failure stops the pipeline
 
-      - name: Validate secrets
+      # Authenticate with GCP
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
+
+      # Configure Google Cloud Project
+      - name: Configure gcloud
+        run: gcloud config set project <PROJECT_ID>
+  
+      # Retrieve .env file from Google Secret Manager
+      - name: Retrieve .env file from Secret Manager
         run: |
-          if [ -z "${{ secrets.GCP_CREDENTIALS_JSON }}" ]; then
-            echo "Error: GCP_CREDENTIALS_JSON secret is not set."
-            exit 1
-          fi
-          if [ -z "${{ secrets.APP_CONFIG }}" ]; then
-            echo "Error: APP_CONFIG secret is not set."
-            exit 1
-          fi
-        continue-on-error: false  # Ensures that failure here stops the pipeline
+          # Ambil file dari Secret Manager
+          gcloud secrets versions access latest --secret=ENV_FILE > .env
+          # Export semua variabel di .env ke $GITHUB_ENV
+          set -a
+          source .env
+          set +a
+  
+      # Debugging: Print environment variables (optional)
+      - name: Print environment variables (optional debugging)
+        run: env
 
-      - name: Setup GCP credentials
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-credentials.json
-        run: |
-          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
-        continue-on-error: false  # Ensures failure stops further steps
-
-      - name: Extract APP_CONFIG and set environment variables
-        run: |
-          echo "${{ secrets.APP_CONFIG }}" > app_config.json
-          cat app_config.json  # Debugging step to check the content of the JSON file
-
-          export PROJECT_ID=$(jq -r '.GCP_PROJECT_ID' app_config.json)
-          export PUBSUB_SUBSCRIPTION_NAME=$(jq -r '.PUBSUB_SUBSCRIPTION_NAME' app_config.json)
-          export PUPPETEER_EXECUTABLE_PATH=$(jq -r '.PUPPETEER_EXECUTABLE_PATH' app_config.json)
-
-          # Check if any required environment variable is empty
-          if [ -z "$PROJECT_ID" ] || [ -z "$PUBSUB_SUBSCRIPTION_NAME" ] || [ -z "$PUPPETEER_EXECUTABLE_PATH" ]; then
-            echo "Error: One or more required environment variables are not set correctly."
-            exit 1
-          fi
-          
-          echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
-          echo "PUBSUB_SUBSCRIPTION_NAME=$PUBSUB_SUBSCRIPTION_NAME" >> $GITHUB_ENV
-          echo "PUPPETEER_EXECUTABLE_PATH=$PUPPETEER_EXECUTABLE_PATH" >> $GITHUB_ENV
-        continue-on-error: false  # Ensures failure stops further steps
-
-      - name: Install jq
-        run: sudo apt-get install -y jq
-        continue-on-error: false  # Ensures failure stops further steps
-
-      - name: Enable Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        continue-on-error: false  # Ensures failure stops further steps
-
+      # Login to GitHub Container Registry
       - name: Login to GitHub Container Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-        continue-on-error: false  # Ensures failure stops further steps
 
+      # Build and push Docker image
       - name: Build and Push Docker image
         run: |
           docker buildx build \
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/one-node-pdf:latest \
-            --cache-to=type=inline \
             --push \
             --file Dockerfile \
-            --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest \
-            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} .
-        continue-on-error: false  # Ensures failure stops further steps
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest 
