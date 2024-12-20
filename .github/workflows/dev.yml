@@ -44,5 +44,5 @@ jobs:
             --push \
             --file Dockerfile \
             --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest \
-            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} .
-            --build-arg ENV_VAR_NAME=".env"
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} \
+            --build-arg ENV_VAR_NAME=".env" .
