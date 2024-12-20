@@ -18,28 +18,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Authenticate with GCP using service account JSON via google-github-actions/auth
-      - name: Authenticate with GCP
-        uses: google-github-actions/auth@v1
+      # Gcp setup
+      - name: Set up GCP Service Account
+        uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}   
 
-      # Configure Google Cloud Project
-      - name: Configure gcloud
+      # Set up environment
+      - name: Set up environment
         run: |
-          gcloud config set project $GCP_PROJECT # Ganti dengan nama proyek Anda jika variabel lingkungan ini belum disetel
-
-      # Retrieve .env file from Google Secret Manager
-      - name: Retrieve .env file from Secret Manager
-        run: |
-          gcloud secrets versions access latest --secret=ONE_NODE_PDF > .env
-          set -a
-          source .env
-          set +a
-
-      # Print environment variables (optional debugging)
-      - name: Print environment variables (optional debugging)
-        run: env
+          gcloud secrets versions access latest --secret="ONE_NODE_PDF" > .env
+          export $(cat .env | xargs)
 
       # Login to GitHub Container Registry
       - name: Login to GitHub Container Registry

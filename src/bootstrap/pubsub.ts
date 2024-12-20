@@ -11,7 +11,10 @@ export const NewPubSubClient = (log: winston.Logger): Subscription => {
         }
 
         if (!pubSubClient) {
-            pubSubClient = new PubSub();
+            pubSubClient = new PubSub({
+                projectId: PubSubConfig.projectId,
+                credentials: PubSubConfig.credentials
+            });
         }
 
         const subscription = pubSubClient.subscription(SubscriptionName);
