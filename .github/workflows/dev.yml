@@ -28,7 +28,7 @@ jobs:
       - name: Set up environment
         run: |
           gcloud secrets versions access latest --secret="ONE_NODE_PDF" > .env
-          export $(cat .env | xargs)
+          export $(grep -v '^#' .env | xargs)
 
       # Login to GitHub Container Registry
       - name: Login to GitHub Container Registry
