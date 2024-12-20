@@ -1,9 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: one-pdf
+    image: ghcr.io/one-d-plate/one-node-pdf/one-node-pdf:latest
     volumes:
       - ./output:/app/output
     env_file:

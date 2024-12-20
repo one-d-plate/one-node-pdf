@@ -24,14 +24,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}   
 
-      # Set up environment
-      - name: Set up environment
-        run: |
-          gcloud secrets versions access latest --secret="ONE_NODE_PDF" > .env
-          set -o allexport
-          source .env
-          set +o allexport
-
       # Login to GitHub Container Registry
       - name: Login to GitHub Container Registry
         run: |
@@ -44,5 +36,5 @@ jobs:
             --push \
             --file Dockerfile \
             --tag ghcr.io/${{ github.repository }}/one-node-pdf:latest \
-            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} \
-            --build-arg ENV_VAR_NAME=".env" .
+            --tag ghcr.io/${{ github.repository }}/one-node-pdf:${{ github.sha }} .
+            # --build-arg ENV_VAR_NAME=".env"  # Uncomment this line if you need to set the build argument
